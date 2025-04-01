@@ -1,3 +1,5 @@
+#Acme Ice Cream Shop (REST API with Express + SQL CRUD)
+
 A backend-only project where I built a complete RESTful API with full CRUD functionality using Express.js and PostgreSQL
 
 Summary:
