@@ -1,52 +1,51 @@
-// Import the pg module to connect to PostgreSQL
+//import pg module to connect to PostgreSQL
 const pg = require('pg');
 
-// Import express to create our API server
+//import express to create API server
 const express = require('express');
 
-// Import morgan for logging incoming requests
+//import morgan for logging incoming requests
 const morgan = require('morgan');
 
-// Create a PostgreSQL client and connect to the local database
-// If we ever deploy this, we'll replace the hardcoded string with an environment variable
+//create PostgreSQL client + connect to local database
 const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/acme_ice_cream_db');
 
-// Create an instance of an Express application
+//create instance of Express application
 const app = express();
 
-// Tell Express to automatically parse incoming JSON (for POST and PUT requests)
+//tell Express to automatically parse incoming JSON (for POST + PUT requests)
 app.use(express.json());
 
-// Log every request to the console using morgan in 'dev' format
+//log every request to console using morgan in 'dev' format
 app.use(morgan('dev'));
 
-// ---------------------------
-//ROUTES - REST API
-// ---------------------------
+//Routes - REST API
 
-// GET /api/flavors - Return all flavors
+//GET /api/flavors - return all flavors
 app.get('/api/flavors', async (req, res, next) => {
   try {
     const SQL = 'SELECT * FROM flavors ORDER BY created_at DESC';
     const response = await client.query(SQL);
-    res.send(response.rows); // Send the array of flavors
+    //send array of flavors
+    res.send(response.rows); 
   } catch (err) {
     next(err);
   }
 });
 
-// GET /api/flavors/:id - Return one flavor by ID
+//GET /api/flavors/:id - return one flavor by ID
 app.get('/api/flavors/:id', async (req, res, next) => {
   try {
     const SQL = 'SELECT * FROM flavors WHERE id = $1';
     const response = await client.query(SQL, [req.params.id]);
-    res.send(response.rows[0]); // Send the single flavor (or undefined if not found)
+    //send single flavor (undefined if not found)
+    res.send(response.rows[0]); 
   } catch (err) {
     next(err);
   }
 });
 
-// POST /api/flavors - Add a new flavor
+//POST /api/flavors - add new flavor
 app.post('/api/flavors', async (req, res, next) => {
   try {
     const SQL = `
@@ -58,13 +57,14 @@ app.post('/api/flavors', async (req, res, next) => {
       req.body.name,
       req.body.is_favorite,
     ]);
-    res.status(201).send(response.rows[0]); // 201 Created + return the new flavor
+    //201 created + return new flavor
+    res.status(201).send(response.rows[0]); 
   } catch (err) {
     next(err);
   }
 });
 
-// PUT /api/flavors/:id - Update an existing flavor
+//PUT /api/flavors/:id - update existing flavor
 app.put('/api/flavors/:id', async (req, res, next) => {
   try {
     const SQL = `
@@ -80,37 +80,37 @@ app.put('/api/flavors/:id', async (req, res, next) => {
       req.body.is_favorite,
       req.params.id,
     ]);
-    res.send(response.rows[0]); // Return the updated flavor
+    //return updated flavor
+    res.send(response.rows[0]); 
   } catch (err) {
     next(err);
   }
 });
 
-// DELETE /api/flavors/:id - Delete a flavor by ID
+//DELETE /api/flavors/:id - delete flavor by ID
 app.delete('/api/flavors/:id', async (req, res, next) => {
   try {
     const SQL = 'DELETE FROM flavors WHERE id = $1';
     await client.query(SQL, [req.params.id]);
-    res.sendStatus(204); // 204 No Content (success, but no response body)
+    //204 No Content (success, but no response body)
+    res.sendStatus(204); 
   } catch (err) {
     next(err);
   }
 });
 
-// ---------------------------
-// INIT FUNCTION
-// ---------------------------
+// init function
 
 const init = async () => {
-  // Connect to the PostgreSQL database
+  //connect to PostgreSQL database
   await client.connect();
   console.log('Connected to the database');
 
-  // Step 1: Drop the table if it already exists
+  //step 1: drop table if already exists
   let SQL = `
     DROP TABLE IF EXISTS flavors;
 
-    -- Step 2: Create the flavors table
+    -- Step 2: create flavors table
     CREATE TABLE flavors (
       id SERIAL PRIMARY KEY,                -- auto-incrementing ID
       name VARCHAR(100) NOT NULL,           -- name of the flavor (string, required)
@@ -122,7 +122,7 @@ const init = async () => {
   await client.query(SQL);
   console.log('Flavors table created');
 
-  // Step 3: Seed the table with initial data
+  //step 3: seed table with initial data
   SQL = `
     INSERT INTO flavors (name, is_favorite) VALUES ('Vanilla', true);
     INSERT INTO flavors (name, is_favorite) VALUES ('Chocolate', false);
@@ -131,11 +131,11 @@ const init = async () => {
   await client.query(SQL);
   console.log('Flavors table seeded with initial data');
 
-  // Step 4: Start the server after DB setup
+  //step 4: start server after database setup
   const port = process.env.PORT || 3000;
   app.listen(port, () => console.log(`Server listening on port ${port}`));
 };
 
-// Call the init function to kick things off
+//call init function to start
 init();
 
