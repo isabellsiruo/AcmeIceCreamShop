@@ -1,0 +1,15 @@
+# Ignore the node_modules folder.
+# This folder contains all the packages your app uses (like express, pg, etc.).
+# It's huge and can be reinstalled by running `npm install`, so no need to push it to GitHub.
+node_modules
+
+# Ignore package-lock.json.
+# This file locks the versions of the packages installed.
+# In simple student projects, we often skip it to avoid version conflicts.
+# (In real-world apps, teams might choose to include it.)
+package-lock.json
+
+# Ignore macOS-specific hidden files.
+# .DS_Store is automatically created by macOS in every folder to store view settings.
+# It's not needed for coding projects.
+.DS_Store
